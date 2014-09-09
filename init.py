@@ -12,15 +12,15 @@ I2CADDR = 0x66 	# i2cdetect
 lRun  	= 0xF 	# run current
 lHold 	= 0xF 	# hold current
 
-vMax 	= 0xF   # velocity Max (0-F)
-vMin 	= 0x3 	# velocity Min (0-F)
+vMax 	= 0x1   # velocity Max (0-F)
+vMin 	= 0x1 	# velocity Min (0-F)
 
 secPos 	= 0x000 # 11 Bit 0-4FF (0x400 = -1024; 0x3ff = 1023)
-shaft 	= False # Motor turn direction (Boolean)
-accel 	= 0x4   # Acceleration (3 Bit)
+shaft 	= True # Motor turn direction (Boolean)
+accel 	= 0x9   # Acceleration (3 Bit)
 
 
-accelShape = False # Acceleration Shape (Boolean)
+accelShape = True # Acceleration Shape (Boolean)
 stepMode   = 0x0  # half stepping, etc 2 Bit (0-3)
 
 # Initialization drive
@@ -110,20 +110,24 @@ if __name__ == "__main__":
     
     # sets the internal position counter to 0
     resetPosition()
-    sleep(2)
-    
+
     # curPos should be 0
-    curPos = getPosition()
-    
+    curPos = 0
+    sleep(3)
     # rotate and take pictures
     for i in range (0,90):
         curPos = curPos + 35
         setPosition(curPos)
         print (i)
         while True:
-             tmcPos = getPosition()
-             print(tmcPos)
-             if abs(tmcPos-curPos) < 2:
-                 system("uvccapture -v -S45 -B190 -C35 -G50 -x640 -y480 -otest/test{:02}.jpg".format(i))
-                 break
+            tmcPos = getPosition() 
+            if abs(tmcPos-curPos) < 1:
+                print(tmcPos)
+                ret = getFullStatus1()    
+                for i in range(1, 8):
+                    print (binary(ret[i]))
+                sleep(.5)
+                #system("uvccapture -v -S45 -B190 -C35 -G50 -x640 -y480 -otest/test{:02}.jpg".format(i))
+                break
+    print("Done")                
 	
