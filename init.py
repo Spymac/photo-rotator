@@ -5,7 +5,7 @@
 ###
 
 I2CDEV = 1 		# /dev/i2c-1
-I2CADDR = 0x66 	# i2cdetect
+I2CADDR = 0x62 	# i2cdetect
 
 
 # SET MOTOR PARAM
@@ -109,8 +109,8 @@ def checkErrors():
             print ('Error'), errorlist1[i-2]
             
     for l in range(0,10):
-        if errors[1][l] == str(1) and l-2 != 6:
-            print ('Error'), errorlist2[l-2]             
+        if errors[1][l] == str(1) and l-2 != 6 and l-2 != 3:
+            print ('Error'), errorlist2[l-2]            
     
 
 #MAIN 
@@ -133,17 +133,14 @@ if __name__ == "__main__":
     sleep(3)
     # rotate and take pictures
     for i in range (0,90):
-        checkErrors()
         curPos = curPos + 35
         setPosition(curPos)
         print (i)
         while True:
-            tmcPos = getPosition() 
+            tmcPos = getPosition()
+            checkErrors()
             if abs(tmcPos-curPos) < 1:
                 print(tmcPos)
-                ret = getFullStatus1()    
-                for i in range(1, 8):
-                    print (binary(ret[i]))
                 sleep(.5)
                 #system("uvccapture -v -S45 -B190 -C35 -G50 -x640 -y480 -otest/test{:02}.jpg".format(i))
                 break
