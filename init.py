@@ -9,18 +9,18 @@ I2CADDR = 0x66 	# i2cdetect
 
 
 # SET MOTOR PARAM
-lRun  	= 0xA 	# run current
-lHold 	= 0xA 	# hold current
+lRun  	= 0xF 	# run current
+lHold 	= 0xF 	# hold current
 
 vMax 	= 0xF   # velocity Max (0-F)
-vMin 	= 0xA 	# velocity Min (0-F)
+vMin 	= 0x3 	# velocity Min (0-F)
 
 secPos 	= 0x000 # 11 Bit 0-4FF (0x400 = -1024; 0x3ff = 1023)
 shaft 	= False # Motor turn direction (Boolean)
 accel 	= 0x4   # Acceleration (3 Bit)
 
 
-accelShape = True # Acceleration Shape (Boolean)
+accelShape = False # Acceleration Shape (Boolean)
 stepMode   = 0x0  # half stepping, etc 2 Bit (0-3)
 
 # Initialization drive
@@ -42,6 +42,10 @@ def isNegative (v):
 from smbus import SMBus
 b = SMBus(I2CDEV)
 
+from time import sleep
+
+from os import system
+
 def setBit(int_type, offset):
     return(int_type | (1 << offset))
 
@@ -57,9 +61,9 @@ def getPositionBytes (newPosition):
 			
 	return [newPosition >> 8, newPosition & 0x00ff]
 
-def setPosition (newPosition)
+def setPosition (newPosition):
 	positionByte = getPositionBytes(newPosition)
-	b.write_i2c_block_data(I2CADDR,0x8B,[0xFF, 0xFF, positionBytes[0], positionBytes[1]])
+	b.write_i2c_block_data(I2CADDR,0x8B,[0xFF, 0xFF, positionByte[0], positionByte[1]])
 
 
  
@@ -90,3 +94,25 @@ if WRITE_RAM_ON_STARTUP:
 if INIT_DRIVE:
 	b.write_i2c_block_data(I2CADDR,0x88,[0xFF, 0xFF,  (vMax << 4) + vMin, targetPos1 >> 8, targetPos1 & 0x00FF, targetPos2 >> 8, targetPos2 & 0x00FF])
 
+setPosition(0)
+sleep(5)
+
+ret = b.read_i2c_block_data(I2CADDR, 0xFC)
+curPos = (ret[1] << 8) + ret[2]
+
+
+for i in range (0,90):
+	curPos = curPos + 35
+	setPosition(curPos)
+	print (i)
+	while True:
+		ret = b.read_i2c_block_data(I2CADDR, 0xFC)
+		tmcPos = (ret[1] << 8) + ret[2]
+		print(tmcPos)
+		if abs(tmcPos-curPos) < 2:
+			# INSERT PHOTO HERE
+			system("uvccapture -v -S45 -B190 -C35 -G50 -x640 -y480 -otest/test{:02}.jpg".format(i))
+			break;
+	
+	
+	
