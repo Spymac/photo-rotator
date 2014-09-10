@@ -35,8 +35,12 @@ INIT_DRIVE = False
 from smbus import SMBus
 from time import sleep
 from os import system
+import RPi.GPIO as GPIO
+import threading
+
 
 b = SMBus(I2CDEV)
+pin = 13
 
 #returns string, not integer
 def binary(num, pre='0b', length=8, spacer=0):
@@ -89,6 +93,8 @@ def setMotorParam():
 def positionInit():
     if INIT_DRIVE:
         b.write_i2c_block_data(I2CADDR,0x88,[0xFF, 0xFF,  (vMax << 4) + vMin, targetPos1 >> 8, targetPos1 & 0x00FF, targetPos2 >> 8, targetPos2 & 0x00FF])
+def capture(a,i):
+	system("uvccapture -v -S45 -B80 -C42 -G5 -x640 -y480 -otest/test{:02}.jpg".format(i))
 
     
 def checkErrors():
@@ -117,6 +123,8 @@ def checkErrors():
 
 #MAIN 
 if __name__ == "__main__":
+    GPIO.setmode(GPIO.BOARD)
+    GPIO.setup(pin, GPIO.OUT)
     
     # GETFULLSTATUS 1
     print ("GETFULLSTATUS 1:\n")
@@ -135,17 +143,32 @@ if __name__ == "__main__":
     sleep(3)
     # rotate and take pictures
     for i in range (0,90):
-        curPos = curPos + 35
-        setPosition(curPos)
+        
         print (i)
         while True:
             tmcPos = getPosition()
             checkErrors()
             if abs(tmcPos-curPos) < 1:
+                
                 print(tmcPos)
-                sleep(.5)
-                #system("uvccapture -v -S45 -B190 -C35 -G50 -x640 -y480 -otest/test{:02}.jpg".format(i))
+                sleep(.8)
+                #system("gphoto2 --capture-image")
+                #sleep(.7)
+                #system("mv capt0000.jpg captures/c{:02}.jpg".format(i))
+                # CAPTURE
+                #t = threading.Thread(target=capture, args = (1,i))
+                #t.daemon = True
+                #t.start()
+                GPIO.output(pin,GPIO.HIGH)
+                # FLASH
+                capture(1,i)
+
+                
+                GPIO.output(pin,GPIO.LOW)
+                curPos = curPos + 35
+                setPosition(curPos)
                 break
+    GPIO.cleanup()
     print ('#################################################################\n')           
     print("Done")                
     print ('#################################################################\n')
