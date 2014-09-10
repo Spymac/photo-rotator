@@ -97,15 +97,9 @@ def capture(a,i):
 	system("uvccapture -v -S45 -B80 -C42 -G5 -x640 -y480 -otest/test{:02}.jpg".format(i))
 
     
-def checkErrors():
-    
+def checkErrors(): 
     ret = getFullStatus1()
-    
-    #list 1 of errors
     errorlist1 = ['VddReset', 'StepLoss', 'ElDef' , 'UV2', 'TSD', 'TW', 'Tinfo: Warning Very High Temperature', 'Tinfo: Warning High Temperature']
-    
-    #list 2 of errors
-    # ??? bit 1 error unknown??????
     errorlist2 = ['OVC1', 'OVC2' , 'unknown' , 'CPFAIL']
     errors = []
     for i in range(4,6):
@@ -114,8 +108,7 @@ def checkErrors():
         if errors[0][i] == str(1) and errors[0][i+1] == str(1) and i == 6:
             print ('Error: Motor Shutdown, High Temperature')
         elif errors[0][i] == str(1):
-            print ('Error'), errorlist1[i-2]
-            
+            print ('Error'), errorlist1[i-2]       
     for l in range(6,10):
         if errors[1][l] == str(1) and l-6 != 2:
             print ('Error'), errorlist2[l-6]            
