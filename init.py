@@ -116,6 +116,12 @@ def checkErrors():
 
 #MAIN 
 if __name__ == "__main__":
+    system("v4l2-ctl --set-ctrl exposure_auto=1")
+    system("v4l2-ctl --set-ctrl exposure_auto_priority=0")
+    system("v4l2-ctl --set-ctrl exposure_absolute=300")
+
+    sleep(.3)
+    
     GPIO.setmode(GPIO.BOARD)
     GPIO.setup(pin, GPIO.OUT)
     
@@ -133,11 +139,12 @@ if __name__ == "__main__":
 
     # curPos should be 0
     curPos = 0
-    sleep(3)
+    sleep(2)
     # rotate and take pictures
+    capture(1,0)
     for i in range (0,90):
         
-        print (i)
+        print (i)       
         while True:
             tmcPos = getPosition()
             checkErrors()
