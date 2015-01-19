@@ -1,7 +1,11 @@
+#!/usr/bin/env python3
+
 from smbus import SMBus
 b = SMBus(1)
 
 addr = 0x62
 
 
-ret = b.block_process_call(addr, 0x81,[])
+ret = b.read_i2c_block_data(addr, 0x81)
+
+print(ret)
