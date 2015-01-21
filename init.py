@@ -30,21 +30,19 @@ targetPos2 = 0x000F
 WRITE_RAM_ON_STARTUP = True
 INIT_DRIVE = False
 
+# CONFIGURATION END #
+
+from smbus import SMBus
+from time import sleep
+from os import system
+
+b = SMBus(I2CDEV)
 
 def binary(num, pre='0b', length=8, spacer=0):
     return '{0}{{:{1}>{2}}}'.format(pre, spacer, length).format(bin(num)[2:])
  
 def isNegative (v):
 	return bool(v >> 15 == 1)
-
-
-
-from smbus import SMBus
-b = SMBus(I2CDEV)
-
-from time import sleep
-
-from os import system
 
 def setBit(int_type, offset):
     return(int_type | (1 << offset))
@@ -65,6 +63,9 @@ def setPosition (newPosition):
 	positionByte = getPositionBytes(newPosition)
 	b.write_i2c_block_data(I2CADDR,0x8B,[0xFF, 0xFF, positionByte[0], positionByte[1]])
 
+def getPosition ()
+	ret = b.read_i2c_block_data(I2CADDR, 0xFC)
+	return (ret[1] << 8) + ret[2]
 
  
 # GETFULLSTATUS 1
@@ -106,8 +107,7 @@ for i in range (0,90):
 	setPosition(curPos)
 	print (i)
 	while True:
-		ret = b.read_i2c_block_data(I2CADDR, 0xFC)
-		tmcPos = (ret[1] << 8) + ret[2]
+		tmcPos = getPosition()
 		print(tmcPos)
 		if abs(tmcPos-curPos) < 2:
 			# INSERT PHOTO HERE
