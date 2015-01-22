@@ -67,6 +67,15 @@ def getPosition ()
 	ret = b.read_i2c_block_data(I2CADDR, 0xFC)
 	return (ret[1] << 8) + ret[2]
 
+def resetPosition ()
+	b.write_byte(I2CADDR, 0x86)
+	
+def hardStop ()
+	b.write_byte(I2CADDR, 0x85)
+
+def gotoSecurePosition ()
+	b.write_byte(I2CADDR, 0x84)
+
  
 # GETFULLSTATUS 1
 print ("GETFULLSTATUS 1:\n")
