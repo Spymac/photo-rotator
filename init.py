@@ -76,7 +76,9 @@ def hardStop ()
 def gotoSecurePosition ()
 	b.write_byte(I2CADDR, 0x84)
 
- 
+def getFullStatus1 ():
+	return b.read_i2c_block_data(I2CADDR, 0x81)
+
 # GETFULLSTATUS 1
 print ("GETFULLSTATUS 1:\n")
 ret = b.read_i2c_block_data(I2CADDR, 0x81)
