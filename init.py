@@ -63,18 +63,19 @@ def setPosition (newPosition):
 	positionByte = getPositionBytes(newPosition)
 	b.write_i2c_block_data(I2CADDR,0x8B,[0xFF, 0xFF, positionByte[0], positionByte[1]])
 
-def getPosition ()
+def getPosition ():
 	ret = b.read_i2c_block_data(I2CADDR, 0xFC)
 	return (ret[1] << 8) + ret[2]
 
-def resetPosition ()
+def resetPosition ():
 	b.write_byte(I2CADDR, 0x86)
 	
-def hardStop ()
+def hardStop ():
 	b.write_byte(I2CADDR, 0x85)
 
-def gotoSecurePosition ()
+def gotoSecurePosition ():
 	b.write_byte(I2CADDR, 0x84)
+
 
  
 # GETFULLSTATUS 1
