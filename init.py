@@ -78,8 +78,6 @@ def gotoSecurePosition():
 
 def getFullStatus1():
     ret = b.read_i2c_block_data(I2CADDR, 0x81)
-    for i in range(1, 8):
-        print (binary(ret[i]))
     return ret    
 
 def getFullStatus2():
@@ -107,6 +105,8 @@ if __name__ == "__main__":
     # GETFULLSTATUS 1
     print ("GETFULLSTATUS 1:\n")
     ret = getFullStatus1()    
+    for i in range(1, 8):
+        print (binary(ret[i]))
      
     # GETFULLSTATUS 2
     print ("\nACTUAL POS:\n")
