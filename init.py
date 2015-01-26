@@ -114,7 +114,7 @@ curPos = (ret[1] << 8) + ret[2]
 
 
 for i in range (0,90):
-	curPos = curPos + 35
+	curPos = curPos + 100
 	setPosition(curPos)
 	print (i)
 	while True:
