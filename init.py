@@ -54,8 +54,8 @@ def getPositionBytes(newPosition):
         else:
             newPosition = setBit(-newPosition, 15)
     else:
-       if newPosition >= 32767:
-           newPosition = 32767
+        if newPosition >= 32767:
+            newPosition = 32767
 			
     return [newPosition >> 8, newPosition & 0x00ff]
 
