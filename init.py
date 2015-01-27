@@ -49,10 +49,7 @@ def setBit(int_type, offset):
 
 def getPositionBytes(newPosition):
     if newPosition < 0:
-        if newPosition <= -32768:
-            newPosition = 0xffff
-        else:
-            newPosition = setBit(-newPosition, 15)
+        print("Negative position values not supported.")
     else:
         if newPosition >= 32767:
             newPosition = 32767
@@ -107,30 +104,16 @@ if __name__ == "__main__":
     ret = getFullStatus1()    
     for i in range(1, 8):
         print (binary(ret[i]))
-     
-    # GETFULLSTATUS 2
-    print ("\nACTUAL POS:\n")
-    ret = getFullStatus2()
-    curPos = (ret[1] << 8) + ret[2]
-    
-    if isNegative(curPos):
-        print (curPos & 0x7FFF)
-    else:
-        print (-(curPos & 0x7FFF))
-    
+        
     # setting motor parameter to configured values
     setMotorParam()
     
-    # initialising position
-    positionInit()
+    # sets the internal position counter to 0
+    resetPosition()
+    sleep(2)
     
-    resetPosition
-    setPosition(0)
-    sleep(5)
-    
-    # GETFULLSTATUS 2
-    ret = getFullStatus2()
-    curPos = (ret[1] << 8) + ret[2]
+    # curPos should be 0
+    curPos = getPosition()
     
     # rotate and take pictures
     for i in range (0,90):
