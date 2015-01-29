@@ -40,7 +40,7 @@ b = SMBus(I2CDEV)
 
 def binary(num, pre='0b', length=8, spacer=0):
     return '{0}{{:{1}>{2}}}'.format(pre, spacer, length).format(bin(num)[2:])
- 
+
 def isNegative(v):
     return bool(v >> 15 == 1)
 
@@ -88,12 +88,28 @@ def setMotorParam():
 def positionInit():
     if INIT_DRIVE:
         b.write_i2c_block_data(I2CADDR,0x88,[0xFF, 0xFF,  (vMax << 4) + vMin, targetPos1 >> 8, targetPos1 & 0x00FF, targetPos2 >> 8, targetPos2 & 0x00FF])
-  
-# not done      
-def checkError():
-    pass
-    #ret1 = getFullStatus1()
-    #ret2 = getFullStatus2()
+
+    
+def checkErrors():
+    
+    ret = getFullStatus1()
+    
+    #list 1 of errors
+    errorlist1 = ['VddReset', 'StepLoss', 'ElDef' , 'UV2', 'TSD', 'TW', 'Tinfo', 'Tinfo']
+    
+    #list 2 of errors
+    # ??? bit 1 error unknown??????
+    errorlist2 = ['Motion', 'Motion', 'Motion', 'ESW', 'OVC1', 'OVC2' , 'unknown' , 'CPFAIL']
+    errors = []
+    for i in range(4,6):
+        errors.append(binary(ret[i]))   
+    for i in range(0,10):
+        if errors[0][i] == str(1):
+            print'Error', errorlist1[i-2]
+        
+    for l in range(0,10):
+        if errors[1][l] == 1:
+            print'Error', errorlist2[l-2]             
     
 
 #MAIN 
@@ -116,6 +132,7 @@ if __name__ == "__main__":
     sleep(3)
     # rotate and take pictures
     for i in range (0,90):
+        checkErrors()
         curPos = curPos + 35
         setPosition(curPos)
         print (i)
@@ -129,5 +146,6 @@ if __name__ == "__main__":
                 sleep(.5)
                 #system("uvccapture -v -S45 -B190 -C35 -G50 -x640 -y480 -otest/test{:02}.jpg".format(i))
                 break
+    print '#################################################################\n'            
     print("Done")                
-	
+    print '#################################################################\n'	
