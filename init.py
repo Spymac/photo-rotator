@@ -38,6 +38,7 @@ from os import system
 
 b = SMBus(I2CDEV)
 
+#returns string, not integer
 def binary(num, pre='0b', length=8, spacer=0):
     return '{0}{{:{1}>{2}}}'.format(pre, spacer, length).format(bin(num)[2:])
 
@@ -108,7 +109,7 @@ def checkErrors():
             print'Error', errorlist1[i-2]
         
     for l in range(0,10):
-        if errors[1][l] == 1:
+        if errors[1][l] == str(1):
             print'Error', errorlist2[l-2]             
     
 
