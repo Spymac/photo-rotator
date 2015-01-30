@@ -107,9 +107,7 @@ def checkErrors():
     for i in range(0,10):
         if errors[0][i] == str(1):
             print ('Error'), errorlist1[i-2]
-        
-    for l in range(0,10):
-        if errors[1][l] == str(1):
+        if errors[1][i] == str(1):
             print ('Error'), errorlist2[l-2]             
     
 
@@ -147,6 +145,6 @@ if __name__ == "__main__":
                 sleep(.5)
                 #system("uvccapture -v -S45 -B190 -C35 -G50 -x640 -y480 -otest/test{:02}.jpg".format(i))
                 break
-    print '#################################################################\n'            
+    print ('#################################################################\n')           
     print("Done")                
-    print '#################################################################\n'	
+    print ('#################################################################\n')
