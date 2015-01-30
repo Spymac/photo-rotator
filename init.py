@@ -105,7 +105,7 @@ def checkErrors():
     for i in range(4,6):
         errors.append(binary(ret[i]))   
     for i in range(0,10):
-        if errors[0][i] == str(1) and errors[0][i+1] and i == 7:
+        if errors[0][i] == str(1) and errors[0][i+1] == str(1) and i == 7:
             print ('Error: Motor Shutdown, High Temperature')
         elif errors[0][i] == str(1):
             print ('Error'), errorlist1[i-2]
