@@ -106,11 +106,11 @@ def checkErrors():
         errors.append(binary(ret[i]))   
     for i in range(0,10):
         if errors[0][i] == str(1):
-            print'Error', errorlist1[i-2]
+            print ('Error'), errorlist1[i-2]
         
     for l in range(0,10):
         if errors[1][l] == str(1):
-            print'Error', errorlist2[l-2]             
+            print ('Error'), errorlist2[l-2]             
     
 
 #MAIN 
