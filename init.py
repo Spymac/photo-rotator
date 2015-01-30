@@ -108,7 +108,7 @@ def checkErrors():
         if errors[0][i] == str(1):
             print ('Error'), errorlist1[i-2]
         if errors[1][i] == str(1):
-            print ('Error'), errorlist2[l-2]             
+            print ('Error'), errorlist2[i-2]             
     
 
 #MAIN 
