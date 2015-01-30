@@ -15,8 +15,8 @@ lHold 	= 0xF 	# hold current
 vMax 	= 0x1   # velocity Max (0-F)
 vMin 	= 0x1 	# velocity Min (0-F)
 
-secPos 	= 0x000 # 11 Bit 0-4FF (0x400 = -1024; 0x3ff = 1023)
-shaft 	= True # Motor turn direction (Boolean)
+secPos = 0x000 # 11 Bit 0-4FF (0x400 = -1024; 0x3ff = 1023)
+shaft 	= False # Motor turn direction (Boolean)
 accel 	= 0x9   # Acceleration (3 Bit)
 
 
@@ -107,8 +107,10 @@ def checkErrors():
     for i in range(0,10):
         if errors[0][i] == str(1):
             print ('Error'), errorlist1[i-2]
-        if errors[1][i] == str(1):
-            print ('Error'), errorlist2[i-2]             
+            
+    for l in range(0,10):
+        if errors[1][l] == str(1) and l-2 != 6:
+            print ('Error'), errorlist2[l-2]             
     
 
 #MAIN 
