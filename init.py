@@ -96,21 +96,23 @@ def checkErrors():
     ret = getFullStatus1()
     
     #list 1 of errors
-    errorlist1 = ['VddReset', 'StepLoss', 'ElDef' , 'UV2', 'TSD', 'TW', 'Tinfo', 'Tinfo']
+    errorlist1 = ['VddReset', 'StepLoss', 'ElDef' , 'UV2', 'TSD', 'TW', 'Tinfo: Warning Very High Temperature', 'Tinfo: Warning High Temperature']
     
     #list 2 of errors
     # ??? bit 1 error unknown??????
-    errorlist2 = ['Motion', 'Motion', 'Motion', 'ESW', 'OVC1', 'OVC2' , 'unknown' , 'CPFAIL']
+    errorlist2 = ['OVC1', 'OVC2' , 'unknown' , 'CPFAIL']
     errors = []
     for i in range(4,6):
         errors.append(binary(ret[i]))   
     for i in range(0,10):
-        if errors[0][i] == str(1):
+        if errors[0][i] == str(1) and errors[0][i+1] and i == 7:
+            print ('Error: Motor Shutdown, High Temperature')
+        elif errors[0][i] == str(1):
             print ('Error'), errorlist1[i-2]
             
-    for l in range(0,10):
-        if errors[1][l] == str(1) and l-2 != 6 and l-2 != 3:
-            print ('Error'), errorlist2[l-2]            
+    for l in range(6,10):
+        if errors[1][l] == str(1) and l-6 != 3:
+            print ('Error'), errorlist2[l-6]            
     
 
 #MAIN 
