@@ -111,7 +111,7 @@ def checkErrors():
             print ('Error'), errorlist1[i-2]
             
     for l in range(6,10):
-        if errors[1][l] == str(1) and l-6 != 3:
+        if errors[1][l] == str(1) and l-6 != 2:
             print ('Error'), errorlist2[l-6]            
     
 
