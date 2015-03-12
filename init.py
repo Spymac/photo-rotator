@@ -40,7 +40,14 @@ import threading
 
 
 b = SMBus(I2CDEV)
+#flash light
 pin = 13
+
+button = 31
+
+green = 33
+red = 35
+yellow = 37
 
 #returns string, not integer
 def binary(num, pre='0b', length=8, spacer=0):
@@ -94,81 +101,138 @@ def positionInit():
     if INIT_DRIVE:
         b.write_i2c_block_data(I2CADDR,0x88,[0xFF, 0xFF,  (vMax << 4) + vMin, targetPos1 >> 8, targetPos1 & 0x00FF, targetPos2 >> 8, targetPos2 & 0x00FF])
 def capture(a,i):
-	system("uvccapture -v -S45 -B80 -C42 -G5 -x640 -y480 -otest/test{:02}.jpg".format(i))
+	system("uvccapture -v -S45 -B80 -C42 -G5 -x640 -y480 -ocaptures/cap{:02}.jpg".format(i))
+	
 
+def mergeImages():
+	GPIO.output(green, GPIO.HIGH)
+	print("Merging")
+	system("convert +append captures/cap*.jpg merge.jpg")
     
-def checkErrors(): 
-    ret = getFullStatus1()
-    errorlist1 = ['VddReset', 'StepLoss', 'ElDef' , 'UV2', 'TSD', 'TW', 'Tinfo: Warning Very High Temperature', 'Tinfo: Warning High Temperature']
-    errorlist2 = ['OVC1', 'OVC2' , 'unknown' , 'CPFAIL']
-    errors = []
-    for i in range(4,6):
-        errors.append(binary(ret[i]))   
-    for i in range(2,10):
-        if errors[0][i] == str(1) and errors[0][i+1] == str(1) and i == 6:
-            print ('Error: Motor Shutdown, High Temperature')
-        elif errors[0][i] == str(1):
-            print ('Error'), errorlist1[i-2]       
-    for l in range(6,10):
-        if errors[1][l] == str(1) and l-6 != 2:
-            print ('Error'), errorlist2[l-6]            
-    
+def checkErrors():
+	try:
+		ret = getFullStatus1()
+		errorlist1 = ['VddReset', 'StepLoss', 'ElDef' , 'UV2', 'TSD', 'TW', 'Tinfo: Warning Very High Temperature', 'Tinfo: Warning High Temperature']
+		errorlist2 = ['OVC1', 'OVC2' , 'unknown' , 'CPFAIL']
+		errors = []
+		for i in range(4,6):
+			errors.append(binary(ret[i]))   
+		for i in range(2,10):
+			if errors[0][i] == str(1) and errors[0][i+1] == str(1) and i == 6:
+				print ('Error: Motor Shutdown, High Temperature')
+				return True
+			elif errors[0][i] == str(1):
+				print ('Error'), errorlist1[i-2]    
+				return True   
+		for l in range(6,10):
+			if errors[1][l] == str(1) and l-6 != 2:
+				print ('Error'), errorlist2[l-6]
+				return True
+    		return False     
+	except:
+		return True
+       
+
+def photoLogic():
+	# First Error Check
+	if checkErrors():
+		GPIO.output(red, GPIO.HIGH)
+		GPIO.output(yellow, GPIO.LOW)
+		GPIO.output(green, GPIO.LOW)
+		while True:
+			if GPIO.input(button) == 1:
+				return
+			
+	GPIO.output(yellow, GPIO.LOW)
+	GPIO.output(red, GPIO.LOW)
+	GPIO.output(green, GPIO.HIGH)
+	
+	while True:
+		if GPIO.input(button) == 1:
+			GPIO.output(green, GPIO.LOW)
+			break
+			
+	# Second Error Check after initial waiting phase
+	if checkErrors():
+		GPIO.output(red, GPIO.HIGH)
+		GPIO.output(yellow, GPIO.LOW)
+		GPIO.output(green, GPIO.LOW)
+		while True:
+			if GPIO.input(button) == 1:
+				return
+			
+	GPIO.output(yellow, GPIO.HIGH)
+		
+	system("v4l2-ctl --set-ctrl exposure_auto=1")
+	system("v4l2-ctl --set-ctrl exposure_auto_priority=0")
+	system("v4l2-ctl --set-ctrl exposure_absolute=300")
+
+	sleep(.3)
+	
+	# setting motor parameter to configured values
+	setMotorParam()
+
+	# sets the internal position counter to 0
+	resetPosition()
+
+	# curPos should be 0
+	curPos = 0
+	sleep(2)
+	# rotate and take pictures
+	capture(1,0)
+	for i in range (0,90):
+	
+		print (i)  
+		while True:
+			if GPIO.input(button) == 1:
+				GPIO.output(yellow, GPIO.LOW)
+				GPIO.output(red, GPIO.HIGH)
+				sleep(.4)
+				GPIO.output(yellow, GPIO.LOW)
+				GPIO.output(green, GPIO.HIGH)
+				sleep(2.5)
+				GPIO.output(red, GPIO.LOW)
+				return 
+				
+			tmcPos = getPosition()
+			if checkErrors():
+				GPIO.output(red, GPIO.HIGH)
+				GPIO.output(yellow, GPIO.LOW)
+				while True:
+					if GPIO.input(button) == 1:
+						return
+			if abs(tmcPos-curPos) < 1:
+			
+				print(tmcPos)
+				sleep(.8)
+				#system("gphoto2 --capture-image")
+				#sleep(.7)
+				#system("mv capt0000.jpg captures/c{:02}.jpg".format(i))
+				# CAPTURE
+				#t = threading.Thread(target=capture, args = (1,i))
+				#t.daemon = True
+				#t.start()
+				GPIO.output(pin,GPIO.HIGH)
+				# FLASH
+				capture(1,i)
+
+			
+				GPIO.output(pin,GPIO.LOW)
+				curPos = curPos + 35
+				setPosition(curPos)
+				break
+	mergeImages()
+	print ('#################################################################\n')           
+	print("Done")                
+	print ('#################################################################\n')
 
 #MAIN 
 if __name__ == "__main__":
-    system("v4l2-ctl --set-ctrl exposure_auto=1")
-    system("v4l2-ctl --set-ctrl exposure_auto_priority=0")
-    system("v4l2-ctl --set-ctrl exposure_absolute=300")
-
-    sleep(.3)
-    
-    GPIO.setmode(GPIO.BOARD)
-    GPIO.setup(pin, GPIO.OUT)
-    
-    # GETFULLSTATUS 1
-    print ("GETFULLSTATUS 1:\n")
-    ret = getFullStatus1()    
-    for i in range(1, 8):
-        print (binary(ret[i]))
-        
-    # setting motor parameter to configured values
-    setMotorParam()
-    
-    # sets the internal position counter to 0
-    resetPosition()
-
-    # curPos should be 0
-    curPos = 0
-    sleep(2)
-    # rotate and take pictures
-    capture(1,0)
-    for i in range (0,90):
-        
-        print (i)       
-        while True:
-            tmcPos = getPosition()
-            checkErrors()
-            if abs(tmcPos-curPos) < 1:
-                
-                print(tmcPos)
-                sleep(.8)
-                #system("gphoto2 --capture-image")
-                #sleep(.7)
-                #system("mv capt0000.jpg captures/c{:02}.jpg".format(i))
-                # CAPTURE
-                #t = threading.Thread(target=capture, args = (1,i))
-                #t.daemon = True
-                #t.start()
-                GPIO.output(pin,GPIO.HIGH)
-                # FLASH
-                capture(1,i)
-
-                
-                GPIO.output(pin,GPIO.LOW)
-                curPos = curPos + 35
-                setPosition(curPos)
-                break
-    GPIO.cleanup()
-    print ('#################################################################\n')           
-    print("Done")                
-    print ('#################################################################\n')
+	GPIO.setmode(GPIO.BOARD)
+	GPIO.setup(pin, GPIO.OUT)
+	GPIO.setup(button,GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
+	GPIO.setup(green, GPIO.OUT)
+	GPIO.setup(red, GPIO.OUT)
+	GPIO.setup(yellow, GPIO.OUT)
+	while True:
+		photoLogic()	
