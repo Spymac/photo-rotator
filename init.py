@@ -102,7 +102,19 @@ def positionInit():
         b.write_i2c_block_data(I2CADDR,0x88,[0xFF, 0xFF,  (vMax << 4) + vMin, targetPos1 >> 8, targetPos1 & 0x00FF, targetPos2 >> 8, targetPos2 & 0x00FF])
 def capture(a,i):
 	system("uvccapture -v -S45 -B80 -C42 -G5 -x640 -y480 -ocaptures/cap{:02}.jpg".format(i))
-	
+
+def mountUSB():
+	system("mount -t vfat -o utf8,uid=pi,gid=pi,noatime /dev/sda1 /media/usbstick")
+
+def umountUSB():
+	system("umount /media/usbstick")
+
+def copyToUSB():
+	mountUSB()
+	system("mkdir /media/usbstick/captures")
+	system("cp captures/*.jpg /media/usbstick/captures/")
+	system("cp merge.jpg /media/usbstick/")
+	umountUSB()
 
 def mergeImages():
 	GPIO.output(green, GPIO.HIGH)
