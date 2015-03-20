@@ -35,6 +35,7 @@ INIT_DRIVE = False
 from smbus import SMBus
 from time import sleep
 from os import system
+from os import path
 import RPi.GPIO as GPIO
 import threading
 
@@ -109,12 +110,20 @@ def mountUSB():
 def umountUSB():
 	system("umount /media/usbstick")
 
+def checkUSB():
+	if os.path.ismount("/media/usbstick"):
+		return True
+	else:
+		GPIO.setup(red, GPIO.HIGH) 
+		return False	
+
 def copyToUSB():
 	mountUSB()
-	system("mkdir /media/usbstick/captures")
-	system("cp captures/*.jpg /media/usbstick/captures/")
-	system("rm captures/*.jpg")
-	#system("cp merge.jpg /media/usbstick/")
+	if checkUSB():
+		system("mkdir /media/usbstick/captures")
+		system("cp captures/*.jpg /media/usbstick/captures/")
+		system("rm captures/*.jpg")
+		#system("cp merge.jpg /media/usbstick/")
 	umountUSB()
 
 def mergeImages():
