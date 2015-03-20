@@ -114,7 +114,7 @@ def checkUSB():
 	if os.path.ismount("/media/usbstick"):
 		return True
 	else:
-		GPIO.setup(red, GPIO.HIGH) 
+		GPIO.output(red, GPIO.HIGH) 
 		return False	
 
 def copyToUSB():
@@ -124,7 +124,7 @@ def copyToUSB():
 		system("cp captures/*.jpg /media/usbstick/captures/")
 		system("rm captures/*.jpg")
 		#system("cp merge.jpg /media/usbstick/")
-	umountUSB()
+		umountUSB()
 
 def mergeImages():
 	GPIO.output(green, GPIO.HIGH)
@@ -164,7 +164,14 @@ def photoLogic():
 		while True:
 			if GPIO.input(button) == 1:
 				return
-			
+	# Check if USB is mounted if not return wait for Button press
+	mountUSB()
+	if not checkUSB():
+		return
+
+	umountUSB()
+		
+
 	GPIO.output(yellow, GPIO.LOW)
 	GPIO.output(red, GPIO.LOW)
 	GPIO.output(green, GPIO.HIGH)
