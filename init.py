@@ -113,7 +113,8 @@ def copyToUSB():
 	mountUSB()
 	system("mkdir /media/usbstick/captures")
 	system("cp captures/*.jpg /media/usbstick/captures/")
-	system("cp merge.jpg /media/usbstick/")
+	system("rm captures/*.jpg")
+	#system("cp merge.jpg /media/usbstick/")
 	umountUSB()
 
 def mergeImages():
@@ -197,6 +198,7 @@ def photoLogic():
 		print (i)  
 		while True:
 			if GPIO.input(button) == 1:
+				copyToUSB()
 				GPIO.output(yellow, GPIO.LOW)
 				GPIO.output(red, GPIO.HIGH)
 				sleep(.4)
@@ -233,7 +235,8 @@ def photoLogic():
 				curPos = curPos + 35
 				setPosition(curPos)
 				break
-	mergeImages()
+	#mergeImages()
+	copyToUSB()
 	print ('#################################################################\n')           
 	print("Done")                
 	print ('#################################################################\n')
