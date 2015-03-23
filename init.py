@@ -192,7 +192,12 @@ def photoLogic():
 		while True:
 			if GPIO.input(button) == 1:
 				return
-			
+	
+	mountUSB()
+	if not checkUSB():
+		return
+	umountUSB()
+		
 	GPIO.output(yellow, GPIO.HIGH)
 		
 	system("v4l2-ctl --set-ctrl exposure_auto=1")
@@ -253,7 +258,7 @@ def photoLogic():
 
 			
 				GPIO.output(pin,GPIO.LOW)
-				curPos = curPos + 35
+				curPos = curPos + 36
 				setPosition(curPos)
 				break
 	#mergeImages()
@@ -261,6 +266,7 @@ def photoLogic():
 	print ('#################################################################\n')           
 	print("Done")                
 	print ('#################################################################\n')
+	return
 
 #MAIN 
 if __name__ == "__main__":
