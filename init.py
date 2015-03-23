@@ -105,13 +105,13 @@ def capture(a,i):
 	system("uvccapture -v -S45 -B80 -C42 -G5 -x640 -y480 -ocaptures/cap{:02}.jpg".format(i))
 
 def mountUSB():
-	system("mount -t vfat -o utf8,uid=pi,gid=pi,noatime /dev/sda1 /media/usbstick")
+	system("mount -t vfat -o utf8,uid=pi,gid=pi,noatime /dev/sda1 /media/usbstick 2> /dev/null")
 
 def umountUSB():
 	system("umount /media/usbstick")
 
 def checkUSB():
-	if os.path.ismount("/media/usbstick"):
+	if path.ismount("/media/usbstick"):
 		return True
 	else:
 		GPIO.output(red, GPIO.HIGH) 
@@ -125,6 +125,9 @@ def copyToUSB():
 		system("rm captures/*.jpg")
 		#system("cp merge.jpg /media/usbstick/")
 		umountUSB()
+		return True
+	else:
+		return False
 
 def mergeImages():
 	GPIO.output(green, GPIO.HIGH)
@@ -214,7 +217,9 @@ def photoLogic():
 		print (i)  
 		while True:
 			if GPIO.input(button) == 1:
-				copyToUSB()
+				if not copyToUSB():
+					GPIO.output(red,GPIO.HIGH)
+					return 
 				GPIO.output(yellow, GPIO.LOW)
 				GPIO.output(red, GPIO.HIGH)
 				sleep(.4)
