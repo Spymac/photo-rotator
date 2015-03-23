@@ -37,7 +37,6 @@ from time import sleep
 from os import system
 from os import path
 import RPi.GPIO as GPIO
-import threading
 
 
 b = SMBus(I2CDEV)
@@ -121,7 +120,9 @@ def copyToUSB():
 	mountUSB()
 	if checkUSB():
 		system("mkdir /media/usbstick/captures")
+		system("mkdir /media/usbstick/web")
 		system("cp captures/*.jpg /media/usbstick/captures/")
+		system("cp html/* /media/usbstick/web/")
 		system("rm captures/*.jpg")
 		#system("cp merge.jpg /media/usbstick/")
 		umountUSB()
