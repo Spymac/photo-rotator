@@ -1,4 +1,4 @@
-# TMC222 via Python i2c
+# Photo Rotator with TMC222 and LEDs
 
 Python (SMBus) i2c communication with TMC222 stepper controller - used on Raspberry Pi. Good starting point for rotating motor.
 
