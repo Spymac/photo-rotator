@@ -180,6 +180,8 @@ def photoLogic():
 	GPIO.output(red, GPIO.LOW)
 	GPIO.output(green, GPIO.HIGH)
 	
+
+	# Waiting for button press
 	while True:
 		if GPIO.input(button) == 1:
 			GPIO.output(green, GPIO.LOW)
@@ -194,23 +196,25 @@ def photoLogic():
 			if GPIO.input(button) == 1:
 				return
 	
+	# Second Error check, if USB is mounted
 	mountUSB()
 	if not checkUSB():
 		return
 	umountUSB()
 		
 	GPIO.output(yellow, GPIO.HIGH)
-		
+	
+	# Setting exposure time
 	system("v4l2-ctl --set-ctrl exposure_auto=1")
 	system("v4l2-ctl --set-ctrl exposure_auto_priority=0")
 	system("v4l2-ctl --set-ctrl exposure_absolute=300")
 
 	sleep(.3)
 	
-	# setting motor parameter to configured values
+	# Setting motor parameter to configured values
 	setMotorParam()
 
-	# sets the internal position counter to 0
+	# Sets the internal position counter to 0
 	resetPosition()
 
 	# curPos should be 0
@@ -222,6 +226,8 @@ def photoLogic():
 	
 		print (i)  
 		while True:
+
+			# abort button
 			if GPIO.input(button) == 1:
 				if not copyToUSB():
 					GPIO.output(red,GPIO.HIGH)
@@ -246,15 +252,10 @@ def photoLogic():
 			
 				print(tmcPos)
 				sleep(.8)
-				#system("gphoto2 --capture-image")
-				#sleep(.7)
-				#system("mv capt0000.jpg captures/c{:02}.jpg".format(i))
-				# CAPTURE
-				#t = threading.Thread(target=capture, args = (1,i))
-				#t.daemon = True
-				#t.start()
-				GPIO.output(pin,GPIO.HIGH)
+				
 				# FLASH
+				GPIO.output(pin,GPIO.HIGH)
+
 				capture(1,i)
 
 			
@@ -262,7 +263,6 @@ def photoLogic():
 				curPos = curPos + 36
 				setPosition(curPos)
 				break
-	#mergeImages()
 	copyToUSB()
 	print ('#################################################################\n')           
 	print("Done")                
