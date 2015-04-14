@@ -10,7 +10,7 @@ $.fn.rotate = function () {
 	var initialPos = Math.abs(curPos);
 	var npics = 90;
 	var container = this;
-
+	// Set width and height
 	if (typeof this.attr("width") != "undefined" && typeof this.attr("height") != "undefined") {
 		if (parseInt(this.attr("width")) != 0)
 			var width = parseInt(this.attr("width"));
@@ -25,19 +25,19 @@ $.fn.rotate = function () {
 		var width = 640;
 		var height = 480;
 	}
-	
-
+	// Set image path
 	var path = this.attr("src");
 	if (path.substr(-1) != '/')
 		path = path + '/';
 
-	// Preload Images
+	// Preload images
 	for (var i = 0; i<npics; i++) {
 		var n = ('00' + i).slice(-2);
 		$('<img />').attr('src', path + "cap" + n + ".jpg").load(function() {
 		   $(this).remove();
 		});
 	}
+	// Set container and image size
 	var scaleImage = function (w, h) {
 		width = w;
 		container.css("width", w + "px");
@@ -46,9 +46,9 @@ $.fn.rotate = function () {
 	}
 	scaleImage(width, height);
 	this.css("background-image","url(" + path + "cap0" + 1 + ".jpg)");
-
+	// Calculate image offset depending on mouse position
 	this.mousemove(function(e){
-        var x = e.pageX - this.offsetLeft;
+        var x = e.pageX - container.offset().left;
         var perc = x/width;
         var n = Math.round(perc*89);
 
@@ -56,7 +56,8 @@ $.fn.rotate = function () {
       
  		container.css("background-image","url(" + path + "cap" + n + ".jpg)");
     });
-	var autoplay_button = $("<button class='rotate-autoplay button'>Autoplay</button>");
+    // Insert button for automatic image rotation
+	var autoplay_button = $("<button class='rotate-autoplay button btn btn-default'>Autoplay</button>");
 	var is_playing = false;
 	var playing_interval = null;
 
@@ -73,7 +74,7 @@ $.fn.rotate = function () {
 					curPos = 0;
 
 			}, 60);
-    	}else {
+    	} else {
 	   		   		clearInterval(playing_interval);
 	   		   		is_playing = false;
 	   	}
